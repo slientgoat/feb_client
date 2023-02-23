@@ -27,13 +27,7 @@ defmodule FebClient.Application do
       )
     ]
 
-    if Mix.env() == :dev do
-      FebClient.set_feb_server("http://localhost:5000/api/multi_up")
-    end
-
-    IO.puts(
-      "febclient info: #{inspect(%{feb_server_url: System.get_env("FEB_SERVER_URL"), poolboy_config: poolboy_config})}"
-    )
+    IO.puts("*** febclient application started: #{inspect(%{poolboy_config: poolboy_config})}")
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

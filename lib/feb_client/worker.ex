@@ -9,7 +9,17 @@ defmodule FebClient.Worker do
 
   @impl true
   def init([]) do
-    Process.put(:submit_inteval, Enum.random(1..5) * 1000)
+    submit_inteval = Enum.random(1..5) * 1000
+    Process.put(:submit_inteval, submit_inteval)
+
+    if Mix.env() == :dev do
+      FebClient.set_feb_server("http://localhost:5000/api/multi_up")
+    end
+
+    IO.puts(
+      "** febclient worker[#{inspect(self())}] started: #{inspect(%{submit_inteval: submit_inteval, feb_server_url: System.get_env("FEB_SERVER_URL")})}"
+    )
+
     send(self(), :push_reports)
     {:ok, []}
   end
