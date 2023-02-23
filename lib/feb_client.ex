@@ -1,11 +1,16 @@
 defmodule FebClient do
   @timeout 5000
-  def set_feb_server(url) do
-    System.put_env("FEB_SERVER_URL", url)
+
+  def enable_dev() do
+    FebClient.set_feb_server("http://localhost:5000/api/multi_up")
   end
 
   def disable() do
-    System.put_env("FEB_SERVER_URL", nil)
+    set_feb_server(nil)
+  end
+
+  def set_feb_server(url) do
+    System.put_env("FEB_SERVER_URL", url)
   end
 
   def call(msg) do

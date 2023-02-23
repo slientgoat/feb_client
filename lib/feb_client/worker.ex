@@ -111,6 +111,6 @@ defmodule FebClient.Worker do
 
   def valid_url?(url) do
     uri = URI.parse(url)
-    uri.scheme != nil && uri.host =~ "."
+    uri.scheme != nil && uri.host != ""
   end
 end
