@@ -27,7 +27,9 @@ defmodule FebClient.Application do
       )
     ]
 
-    IO.puts("*** febclient application started: #{inspect(%{poolboy_config: poolboy_config})}")
+    IO.puts(
+      "*** febclient application started: #{inspect(%{poolboy_config: poolboy_config, feb_server_url: System.get_env("FEB_SERVER_URL")})}"
+    )
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
