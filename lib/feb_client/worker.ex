@@ -44,7 +44,7 @@ defmodule FebClient.Worker do
     inteval = Process.get(:submit_inteval)
     feb_server_url = System.get_env("FEB_SERVER_URL")
 
-    with true <- feb_server_url || :unset_env,
+    with true <- (feb_server_url != "" and feb_server_url != nil) || :unset_env,
          true <- valid_url?(feb_server_url) || :invalid_server_url,
          true <- reports != [] || :ignore,
          {push_list, rest_reports} <- Enum.split(reports, @per_push_limit),
