@@ -18,6 +18,6 @@ defmodule FebClient.Logger do
 
   @compile {:inline, log_message: 2}
   defp log_message(t, msg) do
-    "[feb_client:#{t}] #{msg}"
+    "[feb_client(#{inspect(self())}):#{t}] #{msg}"
   end
 end
