@@ -3,19 +3,19 @@ defmodule FebClient.Worker do
   import FebClient.Logger
 
   @per_push_limit 1000
-  def start_link(args) do
-    GenServer.start_link(__MODULE__, args)
+  def start_link() do
+    GenServer.start_link(__MODULE__, nil)
   end
 
   @impl true
-  def init([]) do
+  def init(_args) do
     submit_inteval = Enum.random(1..5) * 1000
     Process.put(:submit_inteval, submit_inteval)
 
-    debug("started", inspect(%{submit_inteval: submit_inteval}))
+    warn("started", inspect(%{submit_inteval: submit_inteval}))
 
     send(self(), :push_reports)
-    {:ok, []}
+    {:ok, nil}
   end
 
   @impl true
@@ -59,37 +59,32 @@ defmodule FebClient.Worker do
   end
 
   defp push(push_list, feb_server_url) do
-    feb_server_url
-    |> HTTPoison.post(
-      %{body: Jason.encode!(push_list)} |> Jason.encode!(),
-      ["Content-Type": "application/json"],
+    body = %{body: Jason.encode!(push_list)} |> Jason.encode!()
+
+    Finch.build(:post, feb_server_url, ["Content-Type": "application/json"], body,
       recv_timeout: 5000
     )
+    |> Finch.request(MyFinch)
     |> case do
-      {:ok, %HTTPoison.Response{status_code: 200, body: "ok"}} ->
+      {:ok, %Finch.Response{status: 200, body: "ok"}} ->
         "ok"
 
-      {:ok, %HTTPoison.Response{status_code: 200, body: "unhandle error"}} ->
+      {:ok, %Finch.Response{status: 200, body: "unhandle error"}} ->
         :unhandle_error
 
-      {:ok, %HTTPoison.Response{status_code: 400, body: body}} ->
-        debug("bad request", inspect(%{push_list: push_list, reason: body}))
+      {:ok, %Finch.Response{status: 400, body: body}} ->
+        info("bad request", inspect(%{push_list: push_list, reason: body}))
         :bad_request
 
-      {:ok, %HTTPoison.Response{status_code: 404, body: body}} ->
-        debug("not found", inspect(%{push_list: push_list, reason: body}))
+      {:ok, %Finch.Response{status: 404, body: body}} ->
+        info("not found", inspect(%{push_list: push_list, reason: body}))
         :not_found
 
-      {:ok, %HTTPoison.Response{status_code: 500}} ->
+      {:ok, %Finch.Response{status: 500}} ->
         :server_error
 
-      {:error, %HTTPoison.Error{reason: :econnrefused}} ->
-        debug("econnrefused records will push at the next time", %{num: length(push_list)})
-
-        :econnrefused
-
-      {:error, %HTTPoison.Error{reason: reason}} ->
-        {:unkonwn, reason}
+      {:error, err} ->
+        {:unkonwn, inspect(err)}
     end
   end
 

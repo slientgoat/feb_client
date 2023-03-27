@@ -5,34 +5,17 @@ defmodule FebClient.Application do
 
   use Application
 
-  defp poolboy_config do
-    [
-      name: {:local, :worker},
-      worker_module: FebClient.Worker,
-      size: 5,
-      strategy: :fifo,
-      max_overflow: 5
-    ]
-  end
-
   @impl true
   def start(_type, _args) do
-    poolboy_config = poolboy_config()
-
     children = [
-      :poolboy.child_spec(
-        :worker,
-        Application.get_env(:feb_client, :poolboy_config, poolboy_config),
-        []
-      )
+      {Finch, name: MyFinch},
+      {Poolex, pool_id: :worker_pool, worker_module: FebClient.Worker, workers_count: 5}
     ]
 
     feb_server_url = Application.get_env(:feb_client, :api, System.get_env("FEB_SERVER_URL"))
     FebClient.set_api(feb_server_url)
 
-    IO.puts(
-      "*** febclient application started: #{inspect(%{poolboy_config: poolboy_config, feb_server_url: feb_server_url})}"
-    )
+    IO.puts("*** febclient application started: #{inspect(%{feb_server_url: feb_server_url})}")
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

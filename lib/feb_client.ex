@@ -10,18 +10,46 @@ defmodule FebClient do
   end
 
   def call(msg) do
-    :poolboy.transaction(
-      :worker,
-      fn pid -> GenServer.call(pid, msg) end,
-      @timeout
+    # :poolboy.transaction(
+    #   :worker,
+    #   fn pid -> GenServer.call(pid, msg) end,
+    #   @timeout
+    # )
+
+    Poolex.run!(
+      :worker_pool,
+      fn pid ->
+        try do
+          GenServer.call(pid, msg)
+        catch
+          e, r ->
+            IO.inspect("Poolex transaction caught error: #{inspect(e)}, #{inspect(r)}")
+            :ok
+        end
+      end,
+      timeout: @timeout
     )
   end
 
   def cast(msg) do
-    :poolboy.transaction(
-      :worker,
-      fn pid -> GenServer.cast(pid, msg) end,
-      @timeout
+    # :poolboy.transaction(
+    #   :worker_pool,
+    #   fn pid -> GenServer.cast(pid, msg) end,
+    #   @timeout
+    # )
+
+    Poolex.run!(
+      :worker_pool,
+      fn pid ->
+        try do
+          GenServer.cast(pid, msg)
+        catch
+          e, r ->
+            IO.inspect("Poolex transaction caught error: #{inspect(e)}, #{inspect(r)}")
+            :ok
+        end
+      end,
+      timeout: @timeout
     )
   end
 

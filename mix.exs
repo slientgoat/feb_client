@@ -21,6 +21,6 @@ defmodule FebClient.MixProject do
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
-    [{:poolboy, "~> 1.5.1"}, {:httpoison, "~> 1.8"}, {:jason, "~> 1.2"}]
+    [{:poolex, "~> 0.6.0"}, {:finch, "~> 0.15"}, {:jason, "~> 1.2"}]
   end
 end
