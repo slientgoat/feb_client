@@ -64,7 +64,7 @@ defmodule FebClient.Worker do
     Finch.build(:post, feb_server_url, ["Content-Type": "application/json"], body,
       recv_timeout: 5000
     )
-    |> Finch.request(MyFinch)
+    |> Finch.request(FebClientFinch)
     |> case do
       {:ok, %Finch.Response{status: 200, body: "ok"}} ->
         "ok"

@@ -8,7 +8,7 @@ defmodule FebClient.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      {Finch, name: MyFinch},
+      {Finch, name: FebClientFinch},
       {Poolex, pool_id: :worker_pool, worker_module: FebClient.Worker, workers_count: 5}
     ]
 
