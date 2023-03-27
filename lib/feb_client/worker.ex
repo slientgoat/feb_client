@@ -15,7 +15,7 @@ defmodule FebClient.Worker do
     warn("started", inspect(%{submit_inteval: submit_inteval}))
 
     send(self(), :push_reports)
-    {:ok, nil}
+    {:ok, []}
   end
 
   @impl true
