@@ -61,7 +61,7 @@ defmodule FebClient.Worker do
   defp push(push_list, feb_server_url) do
     body = %{body: Jason.encode!(push_list)} |> Jason.encode!()
 
-    Finch.build(:post, feb_server_url, ["Content-Type": "application/json"], body,
+    Finch.build(:post, feb_server_url, [{"Content-Type", "application/json"}], body,
       recv_timeout: 5000
     )
     |> Finch.request(FebClientFinch)
